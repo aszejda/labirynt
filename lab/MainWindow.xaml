@@ -8,7 +8,6 @@
         <Label Content="Szerokosc" HorizontalAlignment="Left" Margin="68,67,0,0" VerticalAlignment="Top" Width="75"/>
         <TextBox x:Name="tb2" HorizontalAlignment="Left" Height="23" Margin="197,70,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
         <Button Content="Button" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="242,115,0,0" Click="Button_Click"/>
-        <Image HorizontalAlignment="Left" Height="300" Margin="392,29,0,0" VerticalAlignment="Top" Width="300"/>
 
     </Grid>
 </Window>

@@ -43,9 +43,8 @@ namespace lab
             int[,] rectangle = new int[bokX, bokY]; //0 - null, can be changed on value 1 or 2; 1 - passage, can't be changed; 2 - wall, can't be changed;
 
             Random rand = new Random();
-            int enterEdge;      // map edge, on which entrance will be placed;               
-            
-            //int enterCell;       edge cell, which will be entrance or exit;             
+            int enterEdge;      // map edge, on which entrance will be placed;   
+            Pen blackPen = new Pen(Brushes.Black, 1);
             
             int [] tEnter = new int [2];
             int [] tExit = new int [2];
@@ -71,7 +70,7 @@ namespace lab
                 tEnter[0] = 0;
                 tEnter[1] = rand.Next(1, bokY - 2);
             }
-           
+            e.Graphics.DrawRectangle(blackPen, 100, 100, 300, 300);
 
             return rectangle;
         }
