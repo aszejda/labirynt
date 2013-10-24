@@ -11,3 +11,6 @@ c:\users\patrycjusz kalinowsk\documents\visual studio 2013\Projects\lab\lab\bin\
 c:\users\patrycjusz kalinowsk\documents\visual studio 2013\Projects\lab\lab\bin\Debug\lab.pdb
 c:\users\patrycjusz kalinowsk\documents\visual studio 2013\Projects\lab\lab\obj\Debug\lab.exe
 c:\users\patrycjusz kalinowsk\documents\visual studio 2013\Projects\lab\lab\obj\Debug\lab.pdb
+D:\www\lab\lab\bin\Debug\lab.exe.config
+D:\www\lab\lab\obj\Debug\lab.exe
+D:\www\lab\lab\obj\Debug\lab.pdb
