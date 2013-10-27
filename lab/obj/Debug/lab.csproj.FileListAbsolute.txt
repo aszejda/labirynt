@@ -14,3 +14,16 @@ c:\users\patrycjusz kalinowsk\documents\visual studio 2013\Projects\lab\lab\obj\
 D:\www\lab\lab\bin\Debug\lab.exe.config
 D:\www\lab\lab\obj\Debug\lab.exe
 D:\www\lab\lab\obj\Debug\lab.pdb
+D:\prog\lab\lab\bin\Debug\lab.exe.config
+D:\prog\lab\lab\obj\Debug\lab.exe
+D:\prog\lab\lab\obj\Debug\lab.pdb
+D:\prog\lab\lab\bin\Debug\lab.exe
+D:\prog\lab\lab\bin\Debug\lab.pdb
+D:\prog\lab\lab\obj\Debug\lab.csprojResolveAssemblyReference.cache
+D:\prog\lab\lab\obj\Debug\MainWindow.baml
+D:\prog\lab\lab\obj\Debug\MainWindow.g.cs
+D:\prog\lab\lab\obj\Debug\App.g.cs
+D:\prog\lab\lab\obj\Debug\lab_MarkupCompile.cache
+D:\prog\lab\lab\obj\Debug\lab.g.resources
+D:\prog\lab\lab\obj\Debug\lab.Properties.Resources.resources
+D:\prog\lab\lab\obj\Debug\lab.csproj.GenerateResource.Cache

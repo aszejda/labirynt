@@ -16,31 +16,89 @@ using System.Drawing;
 
 namespace lab
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    /// 
+    
     public partial class MainWindow : Window
     {
         const int cellPx = 10;          //cell size in pixels
-        const int bokX = 30;            //map width in celss
-        const int bokY = 30;
+        const int edgeX = 30;           //map width in celss
+        const int edgeY = 30;           //map height in cells
         
         public MainWindow()
         {
             InitializeComponent();
-            int[,] rectangle = new int[bokX, bokY];
+            int[,] rectangle = new int[edgeX, edgeY];
             rectangle = createLabirynt();
+            
         }
 
-        private void drawMap ()
+        private void drawMap (int[,] rectangle)
         {
+            List<Rectangle> _rectangles = new List<Rectangle>();
+            Canvas cPan = new Canvas();
+
+            Rectangle rectNull = new Rectangle();
+            Rectangle rectPassage = new Rectangle();
+            Rectangle rectWall = new Rectangle();
             
+            rectNull.Width = cellPx;
+            rectNull.Height = cellPx;
+            rectNull.StrokeThickness = 1;
+            rectNull.Stroke = Brushes.White;
+            rectNull.Fill = Brushes.Yellow;
+
+            rectPassage.Width = cellPx;
+            rectPassage.Height = cellPx;
+            rectPassage.StrokeThickness = 1;
+            rectPassage.Stroke = Brushes.White;
+            rectPassage.Fill = Brushes.Green;
+
+            rectWall.Width = cellPx;
+            rectWall.Height = cellPx;
+            rectWall.StrokeThickness = 1;
+            rectWall.Stroke = Brushes.White;
+            rectWall.Fill = Brushes.Red;
+
+            
+            
+            //cPan.Margin = new Thickness(0);
+            //for (int i = 0; i < edgeX; i++)
+            //{
+            //    for (int j = 0; i < edgeY; j++)
+            //    {
+            //        if (rectangle[i, j] == 0)
+            //        {
+            //            rectNull.Margin = new Thickness(i * cellPx, j * cellPx, 0, 0);
+            //            cPan.Children.Add(rectNull);
+
+            //        }
+            //        else if (rectangle[i, j] == 1)
+            //        {
+            //            rectPassage.Margin = new Thickness(i * cellPx, j * cellPx, 0, 0);
+            //            cPan.Children.Add(rectPassage);
+
+            //        }
+            //        else
+            //        {
+            //            rectWall.Margin = new Thickness(i * cellPx, j * cellPx, 0, 0);
+            //            cPan.Children.Add(rectWall);
+
+            //        }
+            //    }
+            //}
+
+            //rectNull.Margin = new Thickness(0, 0, 0, 0); //pierwsza pozycja pustego kwadratu (kolor żółty)
+            //cPan.Children.Add(rectNull);
+
+            //rectNull.Margin = new Thickness(10, 0, 0, 0); //druga pozycja pustego kwadratu - próba ustawinie go obok pierwszego
+            //cPan.Children.Add(rectNull); //w tym miejscu pojawia się błąd
+
+                        
+            this.Content = cPan;
         }
         
         private int [,] createLabirynt ()
         {            
-            int[,] rectangle = new int[bokX, bokY]; //0 - null, can be changed on value 1 or 2; 1 - passage, can't be changed; 2 - wall, can't be changed;
+            int[,] rectangle = new int[edgeX, edgeY]; //0 - null, can be changed on value 1 or 2; 1 - passage, can't be changed; 2 - wall, can't be changed;
 
             Random rand = new Random();
             int enterEdge;      // map edge, on which entrance will be placed;   
@@ -52,37 +110,32 @@ namespace lab
             enterEdge = rand.Next(1, 5); //lottery edge: 1 - top, 2 - right, 3 - down, 4 - left;
             if(enterEdge == 1)
             {
-                tEnter[0] = rand.Next(1, bokX - 2);
+                tEnter[0] = rand.Next(1, edgeX - 2);
                 tEnter[1] = 0;
             }
             else if(enterEdge == 2)
             {
-                tEnter[0] = bokX -1;
-                tEnter[1] = rand.Next(1, bokY - 2);
+                tEnter[0] = edgeX -1;
+                tEnter[1] = rand.Next(1, edgeY - 2);
             }
             else if(enterEdge == 3)
             {
-                tEnter[0] = rand.Next(1, bokX - 2);
-                tEnter[1] = bokY - 1;
+                tEnter[0] = rand.Next(1, edgeX - 2);
+                tEnter[1] = edgeY - 1;
             }
             else 
             {
                 tEnter[0] = 0;
-                tEnter[1] = rand.Next(1, bokY - 2);
+                tEnter[1] = rand.Next(1, edgeY - 2);
             }
-            e.Graphics.DrawRectangle(blackPen, 100, 100, 300, 300);
-
+            drawMap(rectangle);
             return rectangle;
         }
 
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            
-
-            
-
-
+               
         }
     }
 }
