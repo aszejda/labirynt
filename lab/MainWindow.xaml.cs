@@ -21,8 +21,10 @@ namespace lab
     {
         const int cellPx = 10;          //cell size in pixels
         const int edgeX = 30;           //map width in celss
-        const int edgeY = 30;           //map height in cells
+        const int edgeY = 40;           //map height in cells
+
         
+
         public MainWindow()
         {
             InitializeComponent();
@@ -31,107 +33,159 @@ namespace lab
             
         }
 
-        private void drawMap (int[,] rectangle)
-        {
-            List<Rectangle> _rectangles = new List<Rectangle>();
-            Canvas cPan = new Canvas();
-
-            Rectangle rectNull = new Rectangle();
-            Rectangle rectPassage = new Rectangle();
-            Rectangle rectWall = new Rectangle();
-            
-            rectNull.Width = cellPx;
-            rectNull.Height = cellPx;
-            rectNull.StrokeThickness = 1;
-            rectNull.Stroke = Brushes.White;
-            rectNull.Fill = Brushes.Yellow;
-
-            rectPassage.Width = cellPx;
-            rectPassage.Height = cellPx;
-            rectPassage.StrokeThickness = 1;
-            rectPassage.Stroke = Brushes.White;
-            rectPassage.Fill = Brushes.Green;
-
-            rectWall.Width = cellPx;
-            rectWall.Height = cellPx;
-            rectWall.StrokeThickness = 1;
-            rectWall.Stroke = Brushes.White;
-            rectWall.Fill = Brushes.Red;
-
-            
-            
-            //cPan.Margin = new Thickness(0);
-            //for (int i = 0; i < edgeX; i++)
-            //{
-            //    for (int j = 0; i < edgeY; j++)
-            //    {
-            //        if (rectangle[i, j] == 0)
-            //        {
-            //            rectNull.Margin = new Thickness(i * cellPx, j * cellPx, 0, 0);
-            //            cPan.Children.Add(rectNull);
-
-            //        }
-            //        else if (rectangle[i, j] == 1)
-            //        {
-            //            rectPassage.Margin = new Thickness(i * cellPx, j * cellPx, 0, 0);
-            //            cPan.Children.Add(rectPassage);
-
-            //        }
-            //        else
-            //        {
-            //            rectWall.Margin = new Thickness(i * cellPx, j * cellPx, 0, 0);
-            //            cPan.Children.Add(rectWall);
-
-            //        }
-            //    }
-            //}
-
-            //rectNull.Margin = new Thickness(0, 0, 0, 0); //pierwsza pozycja pustego kwadratu (kolor żółty)
-            //cPan.Children.Add(rectNull);
-
-            //rectNull.Margin = new Thickness(10, 0, 0, 0); //druga pozycja pustego kwadratu - próba ustawinie go obok pierwszego
-            //cPan.Children.Add(rectNull); //w tym miejscu pojawia się błąd
-
-                        
-            this.Content = cPan;
-        }
         
         private int [,] createLabirynt ()
         {            
             int[,] rectangle = new int[edgeX, edgeY]; //0 - null, can be changed on value 1 or 2; 1 - passage, can't be changed; 2 - wall, can't be changed;
 
             Random rand = new Random();
-            int enterEdge;      // map edge, on which entrance will be placed;   
-            Pen blackPen = new Pen(Brushes.Black, 1);
+            int edge;      // map edge, on which entrance or exit will be placed;   
+            
             
             int [] tEnter = new int [2];
             int [] tExit = new int [2];
 
-            enterEdge = rand.Next(1, 5); //lottery edge: 1 - top, 2 - right, 3 - down, 4 - left;
-            if(enterEdge == 1)
+            edge = rand.Next(1, 5); //lottery edge: 1 - top, 2 - right, 3 - down, 4 - left;
+            if(edge == 1)
             {
                 tEnter[0] = rand.Next(1, edgeX - 2);
                 tEnter[1] = 0;
+                rectangle[tEnter[0], tEnter[1]] = 1;
             }
-            else if(enterEdge == 2)
+            else if(edge == 2)
             {
                 tEnter[0] = edgeX -1;
                 tEnter[1] = rand.Next(1, edgeY - 2);
+                rectangle[tEnter[0], tEnter[1]] = 1;
             }
-            else if(enterEdge == 3)
+            else if(edge == 3)
             {
                 tEnter[0] = rand.Next(1, edgeX - 2);
                 tEnter[1] = edgeY - 1;
+                rectangle[tEnter[0], tEnter[1]] = 1;
             }
             else 
             {
                 tEnter[0] = 0;
                 tEnter[1] = rand.Next(1, edgeY - 2);
+                rectangle[tEnter[0], tEnter[1]] = 1;
             }
-            drawMap(rectangle);
+            
+            edge = rand.Next(1, 5); //lottery edge: 1 - top, 2 - right, 3 - down, 4 - left;
+            do
+            {
+                if (edge == 1)
+                {
+                    tExit[0] = rand.Next(1, edgeX - 2);
+                    tExit[1] = 0;
+                    rectangle[tExit[0], tExit[1]] = 1;
+                }
+                else if (edge == 2)
+                {
+                    tExit[0] = edgeX - 1;
+                    tExit[1] = rand.Next(1, edgeY - 2);
+                    rectangle[tExit[0], tExit[1]] = 1;
+                }
+                else if (edge == 3)
+                {
+                    tExit[0] = rand.Next(1, edgeX - 2);
+                    tExit[1] = edgeY - 1;
+                    rectangle[tExit[0], tExit[1]] = 1;
+                }
+                else
+                {
+                    tExit[0] = 0;
+                    tExit[1] = rand.Next(1, edgeY - 2);
+                    rectangle[tExit[0], tExit[1]] = 1;
+                }
+                
+            } while (tEnter[0] == tExit[0] & tEnter[1] == tExit[1]);
+
+            for (int i = 0; i < edgeX; i++)
+            {
+                
+                for (int j = 0; j < edgeY; j++)
+                {
+                    if(j == 0 || j == edgeY - 1)
+                    {
+                        if(rectangle[i, j] != 1)
+                            rectangle[i, j] = 2;
+                    }
+
+                    if (i == 0 || i == edgeX - 1)
+                    {
+                        if (rectangle[i, j] != 1)
+                            rectangle[i, j] = 2;
+                    }
+                }
+            }
+                drawMap(rectangle);
             return rectangle;
         }
 
+        private Visual rectNull (int x, int y)
+        {
+            DrawingVisual drV = new DrawingVisual();
+
+            using (DrawingContext drC = drV.RenderOpen())
+            {
+                Rect rect = new Rect(new Point(x,y), new Size(cellPx, cellPx));
+                drC.DrawRectangle(Brushes.Yellow, null, rect);
+            }
+            return drV;
+        }
+
+        private Visual rectPassage(int x, int y)
+        {
+            DrawingVisual drV = new DrawingVisual();
+
+            using (DrawingContext drC = drV.RenderOpen())
+            {
+                Rect rect = new Rect(new Point(x, y), new Size(cellPx, cellPx));
+                drC.DrawRectangle(Brushes.Green, null, rect);
+            }
+            return drV;
+        }
+
+        private Visual rectWall(int x, int y)
+        {
+            DrawingVisual drV = new DrawingVisual();
+
+            using (DrawingContext drC = drV.RenderOpen())
+            {
+                Rect rect = new Rect(new Point(x, y), new Size(cellPx, cellPx));
+                drC.DrawRectangle(Brushes.Red, null, rect);
+            }
+            return drV;
+        }
+
+
+        private void drawMap(int[,] rectangle)
+        {
+            RenderTargetBitmap bmp = new RenderTargetBitmap(500, 500, 100, 100, PixelFormats.Pbgra32);
+
+
+            for (int i = 0; i < edgeX; i++)
+            {
+                for (int j = 0; j < edgeY; j++)
+                {
+                    if (rectangle[i, j] == 0)
+                    {
+                        bmp.Render(rectNull(i * cellPx, j * cellPx));
+                    }
+                    else if (rectangle[i, j] == 1)
+                    {
+                        bmp.Render(rectPassage(i * cellPx, j * cellPx));
+                    }
+                    else
+                    {
+                        bmp.Render(rectWall(i * cellPx, j * cellPx));
+                    }
+                }
+            }
+
+            myImage.Source = bmp;
+        }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
