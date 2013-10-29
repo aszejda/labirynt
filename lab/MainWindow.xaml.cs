@@ -187,6 +187,12 @@ namespace lab
             myImage.Source = bmp;
         }
 
+        private bool enterExit()
+        {
+            bool valu = false;
+            return valu;
+        }
+
         private void Button_Click(object sender, RoutedEventArgs e)
         {
                
