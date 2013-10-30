@@ -21,15 +21,15 @@ namespace lab
     {
         const int cellPx = 10;          //cell size in pixels
         const int edgeX = 30;           //map width in celss
-        const int edgeY = 40;           //map height in cells
-
+        const int edgeY = 30;           //map height in cells
+        int[,] rectangle = new int[edgeX, edgeY];
         
 
         public MainWindow()
         {
             InitializeComponent();
-            int[,] rectangle = new int[edgeX, edgeY];
-            rectangle = createLabirynt();
+            
+            //rectangle = createLabirynt();
             
         }
 
@@ -99,7 +99,7 @@ namespace lab
                     rectangle[tExit[0], tExit[1]] = 1;
                 }
                 
-            } while (tEnter[0] == tExit[0] & tEnter[1] == tExit[1]);
+            } while (enterExit(tEnter, tExit));
 
             for (int i = 0; i < edgeX; i++)
             {
@@ -119,7 +119,11 @@ namespace lab
                     }
                 }
             }
-                drawMap(rectangle);
+            int[] cord = new int[2];
+            cord[0] = 1;
+            cord[1] = 1;
+            isRectNull(cord, rectangle);
+            drawMap(rectangle);
             return rectangle;
         }
 
@@ -142,7 +146,7 @@ namespace lab
             using (DrawingContext drC = drV.RenderOpen())
             {
                 Rect rect = new Rect(new Point(x, y), new Size(cellPx, cellPx));
-                drC.DrawRectangle(Brushes.Green, null, rect);
+                drC.DrawRectangle(Brushes.White, null, rect);
             }
             return drV;
         }
@@ -187,15 +191,60 @@ namespace lab
             myImage.Source = bmp;
         }
 
-        private bool enterExit()
+        private bool enterExit(int[] enter, int[] exit)
         {
-            bool valu = false;
-            return valu;
+            if ((exit[0] == 0 & enter[0] == 0) || (exit[0] == edgeX - 1 & enter[0] == edgeX - 1))
+            {
+                if (exit[1] == enter[1] || exit[1] - 1 == enter[1] || exit[1] + 1 == enter[1])
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else if ((exit[1] == 0 & enter[1] == 0) || (exit[1] == edgeY - 1 & enter[1] == edgeY - 1))
+            {
+                if (exit[0] == enter[0] || exit[0] - 1 == enter[0] || exit[0] + 1 == enter[0])
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else return false;            
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void Button1_Click(object sender, RoutedEventArgs e)
         {
-               
+            rectangle = createLabirynt();
         }
+
+        private bool isRectNull(int[] potentialCoords, int[,] rectangle)
+        {
+
+            try 
+            {
+                if (rectangle[potentialCoords[0], potentialCoords[1]] == 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+            
+            
+        }
+
+
     }
 }
