@@ -20,8 +20,8 @@ namespace lab
     public partial class MainWindow : Window
     {
         const int cellPx = 10;          //cell size in pixels
-        const int edgeX = 30;           //map width in celss
-        const int edgeY = 30;           //map height in cells
+        const int edgeX = 10;           //map width in celss
+        const int edgeY = 10;           //map height in cells
         int[,] rectangle = new int[edgeX, edgeY];
         
 
@@ -29,36 +29,39 @@ namespace lab
         {
             InitializeComponent();
             
-            //rectangle = createLabirynt();
+            rectangle = CreateLabirynt();
             
         }
 
         
-        private int [,] createLabirynt ()
+        private int [,] CreateLabirynt ()
         {            
             int[,] rectangle = new int[edgeX, edgeY]; //0 - null, can be changed on value 1 or 2; 1 - passage, can't be changed; 2 - wall, can't be changed;
 
             Random rand = new Random();
-            int edge;      // map edge, on which entrance or exit will be placed;   
+            int enterEdge, exitEdge;      // map edge, on which entrance or exit will be placed;   
             
             
-            int [] tEnter = new int [2];
-            int [] tExit = new int [2];
+            int [] tEnter = new int [2];        //entrance coordinates 
+            int [] tExit = new int [2];         //exit coordinates
 
-            edge = rand.Next(1, 5); //lottery edge: 1 - top, 2 - right, 3 - down, 4 - left;
-            if(edge == 1)
+            
+            
+            //lottery entrance
+            enterEdge = rand.Next(1, 5); //lottery edge: 1 - top, 2 - right, 3 - down, 4 - left;
+            if(enterEdge == 1)
             {
                 tEnter[0] = rand.Next(1, edgeX - 2);
                 tEnter[1] = 0;
                 rectangle[tEnter[0], tEnter[1]] = 1;
             }
-            else if(edge == 2)
+            else if(enterEdge == 2)
             {
                 tEnter[0] = edgeX -1;
                 tEnter[1] = rand.Next(1, edgeY - 2);
                 rectangle[tEnter[0], tEnter[1]] = 1;
             }
-            else if(edge == 3)
+            else if(enterEdge == 3)
             {
                 tEnter[0] = rand.Next(1, edgeX - 2);
                 tEnter[1] = edgeY - 1;
@@ -70,38 +73,45 @@ namespace lab
                 tEnter[1] = rand.Next(1, edgeY - 2);
                 rectangle[tEnter[0], tEnter[1]] = 1;
             }
-            
-            edge = rand.Next(1, 5); //lottery edge: 1 - top, 2 - right, 3 - down, 4 - left;
+
+            //lottery exit - can't be the same as enter
             do
             {
-                if (edge == 1)
-                {
-                    tExit[0] = rand.Next(1, edgeX - 2);
-                    tExit[1] = 0;
-                    rectangle[tExit[0], tExit[1]] = 1;
-                }
-                else if (edge == 2)
-                {
-                    tExit[0] = edgeX - 1;
-                    tExit[1] = rand.Next(1, edgeY - 2);
-                    rectangle[tExit[0], tExit[1]] = 1;
-                }
-                else if (edge == 3)
-                {
-                    tExit[0] = rand.Next(1, edgeX - 2);
-                    tExit[1] = edgeY - 1;
-                    rectangle[tExit[0], tExit[1]] = 1;
-                }
-                else
-                {
-                    tExit[0] = 0;
-                    tExit[1] = rand.Next(1, edgeY - 2);
-                    rectangle[tExit[0], tExit[1]] = 1;
-                }
-                
-            } while (enterExit(tEnter, tExit));
+                exitEdge = rand.Next(1, 5); //lottery edge: 1 - top, 2 - right, 3 - down, 4 - left;
+            } while (exitEdge == enterEdge);
+            
+            
+            //do
+            //{
+            if (exitEdge == 1)
+            {
+                    
+                tExit[0] = rand.Next(1, edgeX - 2);
+                tExit[1] = 0;
+                rectangle[tExit[0], tExit[1]] = 1;
+            }
+            else if (exitEdge == 2)
+            {
+                tExit[0] = edgeX - 1;
+                tExit[1] = rand.Next(1, edgeY - 2);
+                rectangle[tExit[0], tExit[1]] = 1;
+            }
+            else if (exitEdge == 3)
+            {
+                tExit[0] = rand.Next(1, edgeX - 2);
+                tExit[1] = edgeY - 1;
+                rectangle[tExit[0], tExit[1]] = 1;
+            }
+            else
+            {
+                tExit[0] = 0;
+                tExit[1] = rand.Next(1, edgeY - 2);
+                rectangle[tExit[0], tExit[1]] = 1;
+            }
 
-            for (int i = 0; i < edgeX; i++)
+            //} while (enterExit(tEnter, tExit)); //checking, whether the exit will not have coordinates, same as entrance
+
+            for (int i = 0; i < edgeX; i++) //
             {
                 
                 for (int j = 0; j < edgeY; j++)
@@ -120,14 +130,13 @@ namespace lab
                 }
             }
             int[] cord = new int[2];
-            cord[0] = 1;
-            cord[1] = 1;
-            isRectNull(cord, rectangle);
-            drawMap(rectangle);
+            
+            
+            DrawMap(rectangle);
             return rectangle;
         }
 
-        private Visual rectNull (int x, int y)
+        private Visual RectNull (int x, int y)
         {
             DrawingVisual drV = new DrawingVisual();
 
@@ -139,7 +148,7 @@ namespace lab
             return drV;
         }
 
-        private Visual rectPassage(int x, int y)
+        private Visual RectPassage(int x, int y)
         {
             DrawingVisual drV = new DrawingVisual();
 
@@ -151,7 +160,7 @@ namespace lab
             return drV;
         }
 
-        private Visual rectWall(int x, int y)
+        private Visual RectWall(int x, int y)
         {
             DrawingVisual drV = new DrawingVisual();
 
@@ -164,66 +173,66 @@ namespace lab
         }
 
 
-        private void drawMap(int[,] rectangle)
+        private void DrawMap(int[,] rectangle)              //drawing labirynt
         {
-            RenderTargetBitmap bmp = new RenderTargetBitmap(500, 500, 100, 100, PixelFormats.Pbgra32);
+            RenderTargetBitmap bmp = new RenderTargetBitmap(500, 500, 100, 100, PixelFormats.Pbgra32); //create bitmap (height, width, dpi, dpi, format) 
 
 
             for (int i = 0; i < edgeX; i++)
             {
-                for (int j = 0; j < edgeY; j++)
+                for (int j = 0; j < edgeY; j++)     
                 {
-                    if (rectangle[i, j] == 0)
+                    if (rectangle[i, j] == 0)                                   //if = 0 then draw empty cell
                     {
-                        bmp.Render(rectNull(i * cellPx, j * cellPx));
+                        bmp.Render(RectNull(i * cellPx, j * cellPx));
                     }
-                    else if (rectangle[i, j] == 1)
+                    else if (rectangle[i, j] == 1)                              //if = 0 then draw passage cell
                     {
-                        bmp.Render(rectPassage(i * cellPx, j * cellPx));
+                        bmp.Render(RectPassage(i * cellPx, j * cellPx));
                     }
-                    else
+                    else                                                        //if no one above, then draw wall cell
                     {
-                        bmp.Render(rectWall(i * cellPx, j * cellPx));
+                        bmp.Render(RectWall(i * cellPx, j * cellPx));
                     }
                 }
             }
 
-            myImage.Source = bmp;
+            myImage.Source = bmp;       //display bit map with labirynt on the Image control
         }
 
-        private bool enterExit(int[] enter, int[] exit)
-        {
-            if ((exit[0] == 0 & enter[0] == 0) || (exit[0] == edgeX - 1 & enter[0] == edgeX - 1))
-            {
-                if (exit[1] == enter[1] || exit[1] - 1 == enter[1] || exit[1] + 1 == enter[1])
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            else if ((exit[1] == 0 & enter[1] == 0) || (exit[1] == edgeY - 1 & enter[1] == edgeY - 1))
-            {
-                if (exit[0] == enter[0] || exit[0] - 1 == enter[0] || exit[0] + 1 == enter[0])
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            else return false;            
-        }
+        //private bool enterExit(int[] enter, int[] exit)     //checking, whether the exit will not have coordinates, same as entrance
+        //{
+        //    if ((exit[0] == 0 & enter[0] == 0) || (exit[0] == edgeX - 1 & enter[0] == edgeX - 1))       // if exit and entrance are on the same Y edge 
+        //    {
+        //        if (exit[1] == enter[1] || exit[1] - 1 == enter[1] || exit[1] + 1 == enter[1])          // if exit is near or on the same coordinate as enterance
+        //        {
+        //            return true;
+        //        }
+        //        else
+        //        {
+        //            return false;
+        //        }
+        //    }
+        //    else if ((exit[1] == 0 & enter[1] == 0) || (exit[1] == edgeY - 1 & enter[1] == edgeY - 1))  // if exit and entrance are on the same X edge   
+        //    {
+        //        if (exit[0] == enter[0] || exit[0] - 1 == enter[0] || exit[0] + 1 == enter[0])          // if exit is near or on the same coordinate as enterance
+        //        {
+        //            return true;
+        //        }
+        //        else
+        //        {
+        //            return false;
+        //        }
+        //    }
+        //    else return false;            
+        //}
 
         private void Button1_Click(object sender, RoutedEventArgs e)
         {
-            rectangle = createLabirynt();
+            rectangle = CreateLabirynt();
         }
 
-        private bool isRectNull(int[] potentialCoords, int[,] rectangle)
+        private bool IsRectNull(int[] potentialCoords, int[,] rectangle)      
         {
 
             try 
@@ -245,6 +254,9 @@ namespace lab
             
         }
 
+        private int Distance(int[] myPosition, int[] exit)
+        {
 
+        }
     }
 }
