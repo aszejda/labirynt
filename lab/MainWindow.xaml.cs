@@ -38,54 +38,62 @@ namespace lab
         {            
             int[,] rectangle = new int[edgeX, edgeY]; //0 - null, can be changed on value 1 or 2; 1 - passage, can't be changed; 2 - wall, can't be changed;
 
-            Random rand = new Random();
-            int enterEdge, exitEdge;      // map edge, on which entrance or exit will be placed;   
-            
-            
-            int [] tEnter = new int [2];        //entrance coordinates 
-            int [] tExit = new int [2];         //exit coordinates
+            //      X/Y x0  x1  x2  ... ... ... x(edgeX-1)
+            //      y0  ?   ?   ?  
+            //      y1  ?   ?   ? 
+            //      y2  ?   ?   ? 
+            //      ...
+            //      ...
+            //      ...
+            //      y(edgeY-1)
 
-            
-            
+            Random rand = new Random();
+            int enterEdge, exitEdge;      // edge map, on which entrance or exit will be placed;   
+
+
+            int[] tEnter = new int[2];                          //entrance coordinates;  [0] - axis x coordinate, [1] - axis y coordinate 
+            int[] tExit = new int[2];                           //exit coordinates  [0] - axis x coordinate, [1] - axis y coordinate 
+            int[] actualPosition = new int[2];
+            int[,] potentialPath = new int[2, edgeX * edgeY];   //table of coordinates leading to exit
+
+            #region Entrance lottery
             //lottery entrance
             enterEdge = rand.Next(1, 5); //lottery edge: 1 - top, 2 - right, 3 - down, 4 - left;
-            if(enterEdge == 1)
+            if(enterEdge == 1)   
             {
-                tEnter[0] = rand.Next(1, edgeX - 2);
-                tEnter[1] = 0;
-                rectangle[tEnter[0], tEnter[1]] = 1;
+                potentialPath[0, 0] = actualPosition[0] = tEnter[0] = rand.Next(1, edgeX - 1);      //drawing cell number on X axis; why -1? example: edgeX = 30 so table starts from 0 to 29. 29 is on top edge in right corner, so normaly it should be -2 but function Random.Next() returns a random number within a specified range(without last number).
+                potentialPath[0, 1] = actualPosition[1] = tEnter[1] = 0;                            //top edge is on the X axis so y need to have value = 0
+                rectangle[tEnter[0], tEnter[1]] = 1;                            //registration enterance; 1 - passage
             }
             else if(enterEdge == 2)
             {
-                tEnter[0] = edgeX -1;
-                tEnter[1] = rand.Next(1, edgeY - 2);
+                potentialPath[0, 0] = actualPosition[0] = tEnter[0] = edgeX - 1;
+                potentialPath[0, 1] = actualPosition[1] = tEnter[1] = rand.Next(1, edgeY - 1);
                 rectangle[tEnter[0], tEnter[1]] = 1;
             }
             else if(enterEdge == 3)
             {
-                tEnter[0] = rand.Next(1, edgeX - 2);
-                tEnter[1] = edgeY - 1;
+                potentialPath[0, 0] = actualPosition[0] = tEnter[0] = rand.Next(1, edgeX - 1);
+                potentialPath[0, 1] = actualPosition[1] = tEnter[1] = edgeY - 1;
                 rectangle[tEnter[0], tEnter[1]] = 1;
             }
             else 
             {
-                tEnter[0] = 0;
-                tEnter[1] = rand.Next(1, edgeY - 2);
+                potentialPath[0, 0] = actualPosition[0] = tEnter[0] = 0;
+                potentialPath[0, 1] = actualPosition[1] = tEnter[1] = rand.Next(1, edgeY - 1);
                 rectangle[tEnter[0], tEnter[1]] = 1;
             }
-
-            //lottery exit - can't be the same as enter
-            do
+            #endregion
+            
+            #region Exit lottery
+                        
+            do            //lottery exit - can't be the same as enter
             {
                 exitEdge = rand.Next(1, 5); //lottery edge: 1 - top, 2 - right, 3 - down, 4 - left;
             } while (exitEdge == enterEdge);
-            
-            
-            //do
-            //{
+                                   
             if (exitEdge == 1)
-            {
-                    
+            {                    
                 tExit[0] = rand.Next(1, edgeX - 2);
                 tExit[1] = 0;
                 rectangle[tExit[0], tExit[1]] = 1;
@@ -109,9 +117,9 @@ namespace lab
                 rectangle[tExit[0], tExit[1]] = 1;
             }
 
-            //} while (enterExit(tEnter, tExit)); //checking, whether the exit will not have coordinates, same as entrance
+            #endregion
 
-            for (int i = 0; i < edgeX; i++) //
+            for (int i = 0; i < edgeX; i++)                     //transformation all border cells in to value 2 (wall), skipping entrance and exitt
             {
                 
                 for (int j = 0; j < edgeY; j++)
@@ -129,9 +137,12 @@ namespace lab
                     }
                 }
             }
+            rectangle[tExit[0], tExit[1]] = 0;          //transformation exit from 1(passage) to 0(null), triggers end of path creation
             int[] cord = new int[2];
-            
-            
+
+            actualPosition = NewPosition(rectangle, potentialPath, actualPosition);     //finding next null position
+            rectangle[actualPosition[0],actualPosition[1]] = 1;                         //making a passage
+            //potentialPath[]
             DrawMap(rectangle);
             return rectangle;
         }
@@ -200,32 +211,6 @@ namespace lab
             myImage.Source = bmp;       //display bit map with labirynt on the Image control
         }
 
-        //private bool enterExit(int[] enter, int[] exit)     //checking, whether the exit will not have coordinates, same as entrance
-        //{
-        //    if ((exit[0] == 0 & enter[0] == 0) || (exit[0] == edgeX - 1 & enter[0] == edgeX - 1))       // if exit and entrance are on the same Y edge 
-        //    {
-        //        if (exit[1] == enter[1] || exit[1] - 1 == enter[1] || exit[1] + 1 == enter[1])          // if exit is near or on the same coordinate as enterance
-        //        {
-        //            return true;
-        //        }
-        //        else
-        //        {
-        //            return false;
-        //        }
-        //    }
-        //    else if ((exit[1] == 0 & enter[1] == 0) || (exit[1] == edgeY - 1 & enter[1] == edgeY - 1))  // if exit and entrance are on the same X edge   
-        //    {
-        //        if (exit[0] == enter[0] || exit[0] - 1 == enter[0] || exit[0] + 1 == enter[0])          // if exit is near or on the same coordinate as enterance
-        //        {
-        //            return true;
-        //        }
-        //        else
-        //        {
-        //            return false;
-        //        }
-        //    }
-        //    else return false;            
-        //}
 
         private void Button1_Click(object sender, RoutedEventArgs e)
         {
@@ -256,7 +241,58 @@ namespace lab
 
         private int Distance(int[] myPosition, int[] exit)
         {
-
+            return 0;
         }
+
+        private int[] NewPosition(int[,] rectangle, int[,] potentialPath, int[] actualPosition )
+        {
+            int[] newPosition = new int[2];             // new Pass position on map
+            int[] potentialPosition = new int[2];       
+            int[] isItNull = new int[5];                //[0]
+            
+            int potentialDirection;
+            Random r = new Random();
+            do
+            {
+                if (isItNull[1] != 0 & isItNull[2] != 0 & isItNull[3] != 0 & isItNull[4] != 0)
+                {
+
+                }
+                potentialDirection = r.Next(1, 5);
+                if(isItNull[potentialDirection] == 0)
+                {
+                    switch (potentialDirection)
+                    {
+                        case 1:                            
+                            potentialPosition[0] = actualPosition[0];
+                            potentialPosition[1] = actualPosition[1]--;
+                            if(IsRectNull(potentialPosition, rectangle))
+                            {
+                                newPosition = potentialPosition;
+                                isItNull[potentialDirection] = 1;
+                            }
+                            isItNull[potentialDirection] = 2;
+                            break;
+
+                        case 2:
+                            break;
+
+                        case 3:
+                            break;
+
+                        case 4:
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+            } while (isItNull[potentialDirection] != 1 );
+            
+
+            return newPosition;
+        }
+
     }
+
 }
