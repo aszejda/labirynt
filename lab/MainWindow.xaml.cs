@@ -22,21 +22,21 @@ namespace lab
         const int cellPx = 10;          //cell size in pixels
         const int edgeX = 10;           //map width in celss
         const int edgeY = 10;           //map height in cells
-        int[,] rectangle = new int[edgeX, edgeY];
+        int[,] tRrectangle = new int[edgeX, edgeY];
         
 
         public MainWindow()
         {
             InitializeComponent();
             
-            rectangle = CreateLabirynt();
+            tRrectangle = CreateLabirynt();
             
         }
 
         
         private int [,] CreateLabirynt ()
         {            
-            int[,] rectangle = new int[edgeX, edgeY]; //0 - null, can be changed on value 1 or 2; 1 - passage, can't be changed; 2 - wall, can't be changed;
+            int[,] tRectangle = new int[edgeX, edgeY]; //0 - null, can be changed on value 1 or 2; 1 - passage, can't be changed; 2 - wall, can't be changed;
 
             //      X/Y x0  x1  x2  ... ... ... x(edgeX-1)
             //      y0  ?   ?   ?  
@@ -49,39 +49,39 @@ namespace lab
 
             Random rand = new Random();
             int enterEdge, exitEdge;      // edge map, on which entrance or exit will be placed;   
-
+            int itr = 0;
 
             int[] tEnter = new int[2];                          //entrance coordinates;  [0] - axis x coordinate, [1] - axis y coordinate 
             int[] tExit = new int[2];                           //exit coordinates  [0] - axis x coordinate, [1] - axis y coordinate 
-            int[] actualPosition = new int[2];
-            int[,] potentialPath = new int[2, edgeX * edgeY];   //table of coordinates leading to exit
+            int[] tActualPosition = new int[2];
+            int[,] tPotentialPath = new int[edgeX * edgeY, 2];   //table of coordinates leading to exit
 
             #region Entrance lottery
             //lottery entrance
             enterEdge = rand.Next(1, 5); //lottery edge: 1 - top, 2 - right, 3 - down, 4 - left;
             if(enterEdge == 1)   
             {
-                potentialPath[0, 0] = actualPosition[0] = tEnter[0] = rand.Next(1, edgeX - 1);      //drawing cell number on X axis; why -1? example: edgeX = 30 so table starts from 0 to 29. 29 is on top edge in right corner, so normaly it should be -2 but function Random.Next() returns a random number within a specified range(without last number).
-                potentialPath[0, 1] = actualPosition[1] = tEnter[1] = 0;                            //top edge is on the X axis so y need to have value = 0
-                rectangle[tEnter[0], tEnter[1]] = 1;                            //registration enterance; 1 - passage
+                tPotentialPath[0, 0] = tActualPosition[0] = tEnter[0] = rand.Next(1, edgeX - 1);        //drawing cell number on X axis; example: edgeX = 30 so table starts from 0 to 29. 29 is on top edge in right corner, so normaly it should be -2 but function Random.Next() returns a random number within a specified range(without last number).
+                tPotentialPath[0, 1] = tActualPosition[1] = tEnter[1] = 0;                              //top edge is on the X axis so y need to have value = 0
+                tRectangle[tEnter[0], tEnter[1]] = 1;                                                   //registration enterance; 1 - passage
             }
             else if(enterEdge == 2)
             {
-                potentialPath[0, 0] = actualPosition[0] = tEnter[0] = edgeX - 1;
-                potentialPath[0, 1] = actualPosition[1] = tEnter[1] = rand.Next(1, edgeY - 1);
-                rectangle[tEnter[0], tEnter[1]] = 1;
+                tPotentialPath[0, 0] = tActualPosition[0] = tEnter[0] = edgeX - 1;
+                tPotentialPath[0, 1] = tActualPosition[1] = tEnter[1] = rand.Next(1, edgeY - 1);
+                tRectangle[tEnter[0], tEnter[1]] = 1;
             }
             else if(enterEdge == 3)
             {
-                potentialPath[0, 0] = actualPosition[0] = tEnter[0] = rand.Next(1, edgeX - 1);
-                potentialPath[0, 1] = actualPosition[1] = tEnter[1] = edgeY - 1;
-                rectangle[tEnter[0], tEnter[1]] = 1;
+                tPotentialPath[0, 0] = tActualPosition[0] = tEnter[0] = rand.Next(1, edgeX - 1);
+                tPotentialPath[0, 1] = tActualPosition[1] = tEnter[1] = edgeY - 1;
+                tRectangle[tEnter[0], tEnter[1]] = 1;
             }
             else 
             {
-                potentialPath[0, 0] = actualPosition[0] = tEnter[0] = 0;
-                potentialPath[0, 1] = actualPosition[1] = tEnter[1] = rand.Next(1, edgeY - 1);
-                rectangle[tEnter[0], tEnter[1]] = 1;
+                tPotentialPath[0, 0] = tActualPosition[0] = tEnter[0] = 0;
+                tPotentialPath[0, 1] = tActualPosition[1] = tEnter[1] = rand.Next(1, edgeY - 1);
+                tRectangle[tEnter[0], tEnter[1]] = 1;
             }
             #endregion
             
@@ -91,31 +91,33 @@ namespace lab
             {
                 exitEdge = rand.Next(1, 5); //lottery edge: 1 - top, 2 - right, 3 - down, 4 - left;
             } while (exitEdge == enterEdge);
-                                   
-            if (exitEdge == 1)
-            {                    
-                tExit[0] = rand.Next(1, edgeX - 2);
-                tExit[1] = 0;
-                rectangle[tExit[0], tExit[1]] = 1;
-            }
-            else if (exitEdge == 2)
+            do
             {
-                tExit[0] = edgeX - 1;
-                tExit[1] = rand.Next(1, edgeY - 2);
-                rectangle[tExit[0], tExit[1]] = 1;
-            }
-            else if (exitEdge == 3)
-            {
-                tExit[0] = rand.Next(1, edgeX - 2);
-                tExit[1] = edgeY - 1;
-                rectangle[tExit[0], tExit[1]] = 1;
-            }
-            else
-            {
-                tExit[0] = 0;
-                tExit[1] = rand.Next(1, edgeY - 2);
-                rectangle[tExit[0], tExit[1]] = 1;
-            }
+                if (exitEdge == 1)
+                {
+                    tExit[0] = rand.Next(1, edgeX - 2);
+                    tExit[1] = 0;
+                }
+                else if (exitEdge == 2)
+                {
+                    tExit[0] = edgeX - 1;
+                    tExit[1] = rand.Next(1, edgeY - 2);
+                }
+                else if (exitEdge == 3)
+                {
+                    tExit[0] = rand.Next(1, edgeX - 2);
+                    tExit[1] = edgeY - 1;
+                }
+                else
+                {
+                    tExit[0] = 0;
+                    tExit[1] = rand.Next(1, edgeY - 2);                    
+                }
+            } while (Distance(tEnter, tExit) <= 3);
+
+            tRectangle[tExit[0], tExit[1]] = 1;
+                                  
+            
 
             #endregion
 
@@ -126,25 +128,34 @@ namespace lab
                 {
                     if(j == 0 || j == edgeY - 1)
                     {
-                        if(rectangle[i, j] != 1)
-                            rectangle[i, j] = 2;
+                        if(tRectangle[i, j] != 1)
+                            tRectangle[i, j] = 2;
                     }
 
                     if (i == 0 || i == edgeX - 1)
                     {
-                        if (rectangle[i, j] != 1)
-                            rectangle[i, j] = 2;
+                        if (tRectangle[i, j] != 1)
+                            tRectangle[i, j] = 2;
                     }
                 }
             }
-            rectangle[tExit[0], tExit[1]] = 0;          //transformation exit from 1(passage) to 0(null), triggers end of path creation
+            tRectangle[tExit[0], tExit[1]] = 0;          //transformation exit from 1(passage) to 0(null), triggers end of path creation
             int[] cord = new int[2];
 
-            actualPosition = NewPosition(rectangle, potentialPath, actualPosition);     //finding next null position
-            rectangle[actualPosition[0],actualPosition[1]] = 1;                         //making a passage
-            //potentialPath[]
-            DrawMap(rectangle);
-            return rectangle;
+            do
+            {
+                itr++;
+                tActualPosition = NewPosition(tRectangle, tPotentialPath, tActualPosition);     //finding next null position
+                tPotentialPath[itr, 0] = tActualPosition[0];
+                tPotentialPath[itr, 1] = tActualPosition[1];
+                tRectangle[tActualPosition[0], tActualPosition[1]] = 1;
+                
+            } while (!IsNeighborAreExit(tRectangle, tActualPosition, tExit));
+                                    //making a passage
+            
+            Distance(tActualPosition, tExit);
+            DrawMap(tRectangle);
+            return tRectangle;
         }
 
         private Visual RectNull (int x, int y)
@@ -214,7 +225,7 @@ namespace lab
 
         private void Button1_Click(object sender, RoutedEventArgs e)
         {
-            rectangle = CreateLabirynt();
+            tRrectangle = CreateLabirynt();
         }
 
         private bool IsRectNull(int[] potentialCoords, int[,] rectangle)      
@@ -235,52 +246,86 @@ namespace lab
             {
                 return false;
             }
-            
-            
         }
 
-        private int Distance(int[] myPosition, int[] exit)
+        private int Distance(int[] actualPosition, int[] exit)
         {
-            return 0;
+            int distance = Math.Abs(actualPosition[0] - exit[0]) + Math.Abs(actualPosition[1] - exit[1]);
+            Label1.Content = distance;
+            return distance;
         }
 
         private int[] NewPosition(int[,] rectangle, int[,] potentialPath, int[] actualPosition )
         {
-            int[] newPosition = new int[2];             // new Pass position on map
-            int[] potentialPosition = new int[2];       
-            int[] isItNull = new int[5];                //[0]
+            int[] tPotentialPosition = new int[2];       
+            int[] isItNull = new int[5];                //[0] = 0:one of cells still have value = 0; [0] = 1: all cells are diferent then 0; [1 - 5] = 0: can be used; [1 - 5] =  
             
-            int potentialDirection;
+            int potentialDirection;                     // 1 - north, 2 - east, 3 - south, 4 - west
             Random r = new Random();
             do
             {
+                tPotentialPosition[0] = actualPosition[0];
+                tPotentialPosition[1] = actualPosition[1];
+                
                 if (isItNull[1] != 0 & isItNull[2] != 0 & isItNull[3] != 0 & isItNull[4] != 0)
                 {
-
+                    isItNull[0] = 1;
                 }
                 potentialDirection = r.Next(1, 5);
                 if(isItNull[potentialDirection] == 0)
                 {
                     switch (potentialDirection)
                     {
-                        case 1:                            
-                            potentialPosition[0] = actualPosition[0];
-                            potentialPosition[1] = actualPosition[1]--;
-                            if(IsRectNull(potentialPosition, rectangle))
+                        case 1: 
+                            --tPotentialPosition[1];
+                            if(IsRectNull(tPotentialPosition, rectangle))
                             {
-                                newPosition = potentialPosition;
-                                isItNull[potentialDirection] = 1;
-                            }
-                            isItNull[potentialDirection] = 2;
+                                if(IsNeighborsArePassage(rectangle, tPotentialPosition, actualPosition))
+                                    isItNull[potentialDirection] = 2;
+                                else
+                                    isItNull[potentialDirection] = 1;
+                            }                                
+                            else
+                                isItNull[potentialDirection] = 2;
                             break;
 
                         case 2:
+                            ++tPotentialPosition[0];
+                            if(IsRectNull(tPotentialPosition, rectangle))
+                            {
+                                if (IsNeighborsArePassage(rectangle, tPotentialPosition, actualPosition))
+                                    isItNull[potentialDirection] = 2;
+                                else
+                                    isItNull[potentialDirection] = 1;
+                            }  
+                            else
+                                isItNull[potentialDirection] = 2;
                             break;
 
                         case 3:
+                            ++tPotentialPosition[1];
+                            if(IsRectNull(tPotentialPosition, rectangle))
+                            {
+                                if (IsNeighborsArePassage(rectangle, tPotentialPosition, actualPosition))
+                                    isItNull[potentialDirection] = 2;
+                                else
+                                    isItNull[potentialDirection] = 1;
+                            }  
+                            else
+                                isItNull[potentialDirection] = 2;
                             break;
 
                         case 4:
+                            --tPotentialPosition[0];
+                            if(IsRectNull(tPotentialPosition, rectangle))
+                            {
+                                if (IsNeighborsArePassage(rectangle, tPotentialPosition, actualPosition))
+                                    isItNull[potentialDirection] = 2;
+                                else
+                                    isItNull[potentialDirection] = 1;
+                            }  
+                            else
+                                isItNull[potentialDirection] = 2;
                             break;
 
                         default:
@@ -290,9 +335,95 @@ namespace lab
             } while (isItNull[potentialDirection] != 1 );
             
 
-            return newPosition;
+            return tPotentialPosition;
         }
 
+        private bool IsNeighborsArePassage(int[,] rectangle, int[] potentialPosition, int[] actualPosition)
+        {
+            bool trueFalse;
+
+            //North neighbor checking
+            if (rectangle[potentialPosition[0], --potentialPosition[1]] == 1)
+            {
+                if (!actualPosition.Except(potentialPosition).Any())
+                    trueFalse = false;
+                else
+                    return true;                
+            }
+            else
+                trueFalse = false;
+            ++potentialPosition[1];
+
+
+            //East neighbor checking
+            if (rectangle[++potentialPosition[0], potentialPosition[1]] == 1)
+            {
+                if (!actualPosition.Except(potentialPosition).Any())
+                    trueFalse = false;
+                else
+                    return true;                
+            }
+            else
+                trueFalse = false;
+            --potentialPosition[0];
+
+            //South neighbor checking
+            if (rectangle[potentialPosition[0], ++potentialPosition[1]] == 1)
+            {
+                if (!actualPosition.Except(potentialPosition).Any())
+                    trueFalse = false;
+                else
+                    return true;                
+            }
+            else
+                trueFalse = false;
+            --potentialPosition[1];
+
+            //West neighbor checking
+            if (rectangle[--potentialPosition[0], potentialPosition[1]] == 1)
+            {
+                if (!actualPosition.Except(potentialPosition).Any())
+                    trueFalse = false;
+                else
+                    return true;                
+            }
+            else
+                trueFalse = false;
+            ++potentialPosition[0];
+
+            return trueFalse;
+        }
+
+        private bool IsNeighborAreExit(int[,] rectangle, int[] actualPosition, int[] exit)
+        {
+            int[] potentialPosition = new int[2];
+
+            potentialPosition[0] = actualPosition[0];
+            potentialPosition[1] = actualPosition[1];
+            --potentialPosition[1];
+            if(!potentialPosition.Except(exit).Any())
+                return true;
+
+            potentialPosition[0] = actualPosition[0];
+            potentialPosition[1] = actualPosition[1];
+            ++potentialPosition[0];
+            if(!potentialPosition.Except(exit).Any())
+                return true;
+
+            potentialPosition[0] = actualPosition[0];
+            potentialPosition[1] = actualPosition[1];
+            ++potentialPosition[1];
+            if(!potentialPosition.Except(exit).Any())
+                return true;
+
+            potentialPosition[0] = actualPosition[0];
+            potentialPosition[1] = actualPosition[1];
+            --potentialPosition[0];
+            if(!potentialPosition.Except(exit).Any())
+                return true;
+
+            return false;
+        }
     }
 
 }
