@@ -139,7 +139,7 @@ namespace lab
                     }
                 }
             }
-            tRectangle[tExit[0], tExit[1]] = 0;          //transformation exit from 1(passage) to 0(null), triggers end of path creation
+            //tRectangle[tExit[0], tExit[1]] = 0;          //transformation exit from 1(passage) to 0(null), triggers end of path creation
             int[] cord = new int[2];
 
             do
@@ -345,7 +345,7 @@ namespace lab
             //North neighbor checking
             if (rectangle[potentialPosition[0], --potentialPosition[1]] == 1)
             {
-                if (!actualPosition.Except(potentialPosition).Any())
+                if (CompareArray(actualPosition, potentialPosition))
                     trueFalse = false;
                 else
                     return true;                
@@ -358,7 +358,7 @@ namespace lab
             //East neighbor checking
             if (rectangle[++potentialPosition[0], potentialPosition[1]] == 1)
             {
-                if (!actualPosition.Except(potentialPosition).Any())
+                if (CompareArray(actualPosition, potentialPosition))
                     trueFalse = false;
                 else
                     return true;                
@@ -370,7 +370,7 @@ namespace lab
             //South neighbor checking
             if (rectangle[potentialPosition[0], ++potentialPosition[1]] == 1)
             {
-                if (!actualPosition.Except(potentialPosition).Any())
+                if (CompareArray(actualPosition, potentialPosition))
                     trueFalse = false;
                 else
                     return true;                
@@ -382,7 +382,7 @@ namespace lab
             //West neighbor checking
             if (rectangle[--potentialPosition[0], potentialPosition[1]] == 1)
             {
-                if (!actualPosition.Except(potentialPosition).Any())
+                if (CompareArray(actualPosition, potentialPosition))
                     trueFalse = false;
                 else
                     return true;                
@@ -395,34 +395,46 @@ namespace lab
         }
 
         private bool IsNeighborAreExit(int[,] rectangle, int[] actualPosition, int[] exit)
-        {
+        {            
             int[] potentialPosition = new int[2];
 
             potentialPosition[0] = actualPosition[0];
             potentialPosition[1] = actualPosition[1];
-            --potentialPosition[1];
-            if(!potentialPosition.Except(exit).Any())
+            --potentialPosition[1];                     //North
+            if (CompareArray(potentialPosition, exit))
                 return true;
 
             potentialPosition[0] = actualPosition[0];
             potentialPosition[1] = actualPosition[1];
-            ++potentialPosition[0];
-            if(!potentialPosition.Except(exit).Any())
+            ++potentialPosition[0];                     //East
+            if (CompareArray(potentialPosition, exit))
                 return true;
 
             potentialPosition[0] = actualPosition[0];
             potentialPosition[1] = actualPosition[1];
-            ++potentialPosition[1];
-            if(!potentialPosition.Except(exit).Any())
+            ++potentialPosition[1];                     //South
+            if (CompareArray(potentialPosition, exit))
                 return true;
 
             potentialPosition[0] = actualPosition[0];
             potentialPosition[1] = actualPosition[1];
-            --potentialPosition[0];
-            if(!potentialPosition.Except(exit).Any())
+            --potentialPosition[0];                     //West
+            if (CompareArray(potentialPosition, exit))
                 return true;
 
             return false;
+        }
+
+        private bool CompareArray(int[] tA, int[] tB)
+        {
+            int j = 0;
+            foreach(int i in tA)
+            {
+                if (tB[j] != i)
+                    return false;
+                j++;
+            }
+            return true;
         }
     }
 
