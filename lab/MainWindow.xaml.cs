@@ -20,8 +20,8 @@ namespace lab
     public partial class MainWindow : Window
     {
         const int cellPx = 10;          //cell size in pixels
-        const int edgeX = 10;           //map width in celss
-        const int edgeY = 10;           //map height in cells
+        const int edgeX = 40;           //map width in celss
+        const int edgeY = 40;           //map height in cells
         int[,] tRrectangle = new int[edgeX, edgeY];
         
 
@@ -53,6 +53,7 @@ namespace lab
 
             int[] tEnter = new int[2];                          //entrance coordinates;  [0] - axis x coordinate, [1] - axis y coordinate 
             int[] tExit = new int[2];                           //exit coordinates  [0] - axis x coordinate, [1] - axis y coordinate 
+            int[] tNewPosition = new int[2];
             int[] tActualPosition = new int[2];
             int[,] tPotentialPath = new int[edgeX * edgeY, 2];   //table of coordinates leading to exit
 
@@ -141,20 +142,61 @@ namespace lab
             }
             //tRectangle[tExit[0], tExit[1]] = 0;          //transformation exit from 1(passage) to 0(null), triggers end of path creation
             int[] cord = new int[2];
-
+            itr++;
+            Random rd = new Random();
             do
             {
-                itr++;
-                tActualPosition = NewPosition(tRectangle, tPotentialPath, tActualPosition);     //finding next null position
-                tPotentialPath[itr, 0] = tActualPosition[0];
-                tPotentialPath[itr, 1] = tActualPosition[1];
-                tRectangle[tActualPosition[0], tActualPosition[1]] = 1;
                 
-            } while (!IsNeighborAreExit(tRectangle, tActualPosition, tExit));
-                                    //making a passage
+                tNewPosition = NewPosition(tRectangle, tActualPosition, rd);     //finding next null position
+                if (tNewPosition[0] == 0 & tNewPosition[1] == 0)
+                {
+                    itr--;
+                    tActualPosition[0] = tPotentialPath[itr, 0];
+                    tActualPosition[1] = tPotentialPath[itr, 1];
+                }
+                else
+                {
+                    
+                    tPotentialPath[itr, 0] = tActualPosition[0] = tNewPosition[0];
+                    tPotentialPath[itr, 1] = tActualPosition[1] = tNewPosition[1];
+                    tRectangle[tActualPosition[0], tActualPosition[1]] = 1;
+                    itr++;
+                }
+                
+            } while (itr != 0);
             
-            Distance(tActualPosition, tExit);
-            DrawMap(tRectangle);
+            if(exitEdge == 1)
+            {
+                tRectangle[tExit[0], tExit[1] + 1] = 1;
+            }
+            else if(exitEdge == 2)
+            {
+                tRectangle[tExit[0] - 1, tExit[1]] = 1;
+            }
+            else if (exitEdge == 3)
+            {
+                tRectangle[tExit[0], tExit[1] - 1] = 1;
+            }
+            else if (exitEdge == 4)
+            {
+                tRectangle[tExit[0] + 1, tExit[1]] = 1;
+            }
+            else
+            {
+                // cos nie tak
+            }
+
+            for (int i = 0; i < edgeX; i++)
+            {
+                for (int j = 0; j < edgeY; j++)
+                {
+                    if (tRectangle[i, j] == 0)
+                        tRectangle[i, j] = 2;
+                }
+            }
+
+                //Distance(tActualPosition, tExit);
+                DrawMap(tRectangle);
             return tRectangle;
         }
 
@@ -189,7 +231,7 @@ namespace lab
             using (DrawingContext drC = drV.RenderOpen())
             {
                 Rect rect = new Rect(new Point(x, y), new Size(cellPx, cellPx));
-                drC.DrawRectangle(Brushes.Red, null, rect);
+                drC.DrawRectangle(Brushes.Black, null, rect);
             }
             return drV;
         }
@@ -255,40 +297,40 @@ namespace lab
             return distance;
         }
 
-        private int[] NewPosition(int[,] rectangle, int[,] potentialPath, int[] actualPosition )
+        private int[] NewPosition(int[,] rectangle, int[] actualPosition, Random r)
         {
             int[] tPotentialPosition = new int[2];       
-            int[] isItNull = new int[5];                //[0] = 0:one of cells still have value = 0; [0] = 1: all cells are diferent then 0; [1 - 5] = 0: can be used; [1 - 5] =  
+            int[] isItNull = new int[5];
+            int potentialDirection;                     
             
-            int potentialDirection;                     // 1 - north, 2 - east, 3 - south, 4 - west
-            Random r = new Random();
             do
             {
-                tPotentialPosition[0] = actualPosition[0];
+                tPotentialPosition[0] = actualPosition[0];                      
                 tPotentialPosition[1] = actualPosition[1];
                 
-                if (isItNull[1] != 0 & isItNull[2] != 0 & isItNull[3] != 0 & isItNull[4] != 0)
+                if (isItNull[1] != 0 & isItNull[2] != 0 & isItNull[3] != 0 & isItNull[4] != 0)  //jezeli wszystke pozycje (procz indeksowej [0]) nie sa zerowe czyli sa przejsciamy lub tez scianami
                 {
-                    isItNull[0] = 1;
+                    isItNull[0] = 1;                                                            //to indeks ustawiamy na wartość 0 dzieki czemu przerwiemy petle
                 }
-                potentialDirection = r.Next(1, 5);
-                if(isItNull[potentialDirection] == 0)
+                potentialDirection = r.Next(1, 5);                                              //losowanie potencjalnego kierunku gdzie: 1 - polnoc, 2 - wschod, 3 - poludnie, 4 - zachod
+                if(isItNull[potentialDirection] == 0)                                           //sprawdzamy czy dany kierunek nie zostal juz wykorzystany, jesli nie - mozemy wykonac instrukcje
                 {
                     switch (potentialDirection)
                     {
+                        //POLNOC
                         case 1: 
-                            --tPotentialPosition[1];
-                            if(IsRectNull(tPotentialPosition, rectangle))
+                            --tPotentialPosition[1];                                            //zmniejszamy wartosc indeksu na osi Y o jeden czyli przesowamy sie o jeden do gory
+                            if(IsRectNull(tPotentialPosition, rectangle))                       //sprawdzamy czy pole jest puste (ma wartosc 0) i bedziemy mogli na nim wstawic przejscie
                             {
-                                if(IsNeighborsArePassage(rectangle, tPotentialPosition, actualPosition))
-                                    isItNull[potentialDirection] = 2;
+                                if(IsNeighborsArePassage(rectangle, tPotentialPosition, actualPosition))    //sprawdzamy czy sasiednie pola nie sa przypadkiem przejsciem 
+                                    isItNull[potentialDirection] = 2;                           //oznaczamy iz nie moze byc przejsciem i nalezy szukac dalej
                                 else
-                                    isItNull[potentialDirection] = 1;
+                                    isItNull[potentialDirection] = 1;                           //oznaczamy iz pole moze byc przejsciem
                             }                                
-                            else
-                                isItNull[potentialDirection] = 2;
+                            else                                                                
+                                isItNull[potentialDirection] = 2;                               //oznaczamy iz nie moze byc przejsciem i nalezy szukac dalej
                             break;
-
+                        //WSCHOD
                         case 2:
                             ++tPotentialPosition[0];
                             if(IsRectNull(tPotentialPosition, rectangle))
@@ -301,7 +343,7 @@ namespace lab
                             else
                                 isItNull[potentialDirection] = 2;
                             break;
-
+                        //POLUDNIE
                         case 3:
                             ++tPotentialPosition[1];
                             if(IsRectNull(tPotentialPosition, rectangle))
@@ -314,7 +356,7 @@ namespace lab
                             else
                                 isItNull[potentialDirection] = 2;
                             break;
-
+                        //ZACHOD
                         case 4:
                             --tPotentialPosition[0];
                             if(IsRectNull(tPotentialPosition, rectangle))
@@ -332,8 +374,13 @@ namespace lab
                             break;
                     }
                 }
-            } while (isItNull[potentialDirection] != 1 );
+            } while (isItNull[potentialDirection] != 1 & isItNull[0] == 0);        //petla ma sie wykonywac do poki ktores z pol nie zostanie oznaczone jako przejscie lub tez indeks[0] jest rowny 0 - czyli nie wszystkie kierunki zostaly jeszcze sprawdzone
             
+            if(isItNull[0] == 1)                //jezeli = 1 -> zadne z pol nie moze byc przejsciem
+            {
+                tPotentialPosition[0] = 0;      //zerujemy obie pozycje
+                tPotentialPosition[1] = 0;      //aby cofnac sie do tylu i tam szukac kolejnego przejscia
+            }
 
             return tPotentialPosition;
         }
